@@ -19,7 +19,7 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package ca.aaronlevin.scala
+package ca.aaronlevin
 
 import cats.{ Functor, Monad }
 import scala.language.higherKinds

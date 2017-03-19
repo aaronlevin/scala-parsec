@@ -1,6 +1,8 @@
 # scala-parsec #
 
-Welcome to scala-parsec!
+work-in-progress
+
+(Welcome to scala-parsec!)
 
 ## Contribution policy ##
 

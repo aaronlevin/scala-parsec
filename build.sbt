@@ -10,7 +10,9 @@ lazy val `scala-parsec` =
     .settings(
       libraryDependencies ++= Seq(
         library.scalaCheck % Test,
-        library.scalaTest  % Test
+        library.scalaTest  % Test,
+        library.cats,
+        library.kindProjector
       )
     )
 
@@ -23,9 +25,15 @@ lazy val library =
     object Version {
       val scalaCheck = "1.13.4"
       val scalaTest  = "3.0.1"
+      val cats       = "0.9.0"
+      val kindProjector = "0.9.3"
     }
     val scalaCheck = "org.scalacheck" %% "scalacheck" % Version.scalaCheck
     val scalaTest  = "org.scalatest"  %% "scalatest"  % Version.scalaTest
+    val cats       = "org.typelevel"  %% "cats"       % Version.cats
+    val kindProjector = compilerPlugin(
+      "org.spire-math" % "kind-projector" % "0.9.3" cross CrossVersion.binary
+    )
   }
 
 // *****************************************************************************
@@ -40,8 +48,8 @@ lazy val settings =
 lazy val commonSettings =
   Seq(
     // scalaVersion and crossScalaVersions from .travis.yml via sbt-travisci
-    // scalaVersion := "2.12.1",
-    // crossScalaVersions := Seq(scalaVersion.value, "2.11.8"),
+    scalaVersion := "2.12.1",
+    crossScalaVersions := Seq(scalaVersion.value, "2.11.8"),
     organization := "ca.aaronlevin",
     licenses += ("MIT",
                  url("https://opensource.org/licenses/MIT")),

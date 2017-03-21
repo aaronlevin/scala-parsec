@@ -209,12 +209,12 @@ package object parsec {
   ): Either[ParseError, A] =
     runPT[S, Id, T, Unit, A](parser, Unit, source, s)
 
-  // this will blow the stack at n=9600 on my machine
+  // this will blow the stack at n=2490 on my machine
   def stackTest(n: Int) = {
-    val monad                              = parsecMonad[Char, Unit, List]
+    val monad                              = parsecMonad[String, Unit, Id]
     val r                                  = monad.pure(333)
-    val rr: ParsecT[Char, Unit, List, Int] = (1 to n).foldLeft(r)((r, _) => r.map(_ + 1))
+    val rr: ParsecT[String, Unit, Id, Int] = (1 to n).foldLeft(r)((r, _) => r.map(_ + 1))
 
-    runPT[Char, List, Char, Unit, Int](rr, Unit, "aaron", 'c')
+    runPT[String, Id, Char, Unit, Int](rr, Unit, "aaron", "cool")
   }
 }

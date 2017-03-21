@@ -21,7 +21,8 @@
 
 package ca.aaronlevin
 
-import cats.{ Functor, Monad }
+import cats.{ Functor, Id, Monad }
+import cats.implicits._
 import scala.language.higherKinds
 
 package object parsec {
@@ -187,15 +188,33 @@ package object parsec {
     parser.apply(state, cok, cerr, eok, eerr)
   }
 
-  /**
-  def runPT[S,M[_],T, U, A](parser: ParsecT[S,U,M,A],
-                            user: U,
-                            sourceName: SourceName,
-                            s: S
-                           ): M[Either[ParseError,A]] = {
-    val state = State(s,initialPos(sourceName), user)
+  def runPT[S, M[_], T, U, A](parser: ParsecT[S, U, M, A], user: U, sourceName: SourceName, s: S)(
+      implicit monad: Monad[M]
+  ): M[Either[ParseError, A]] = {
+    val state = State(s, initialPos(sourceName), user)
+    monad.flatMap(runParsecT(parser, state)) { consumedRes =>
+      val result = consumedRes match {
+        case Empty(e)    => e
+        case Consumed(c) => c
+      }
+      monad.map(result) {
+        case Ok(x, _, _) => Right(x)
+        case Error(err)  => Left(err)
+      }
+    }
+  }
 
+  def parse[S, T, A](parser: ParsecT[S, Unit, Id, A], source: SourceName, s: S)(
+      implicit stream: ParsecStream[S, Id, T]
+  ): Either[ParseError, A] =
+    runPT[S, Id, T, Unit, A](parser, Unit, source, s)
 
-  }*/
+  // this will blow the stack at n=9600 on my machine
+  def stackTest(n: Int) = {
+    val monad                              = parsecMonad[Char, Unit, List]
+    val r                                  = monad.pure(333)
+    val rr: ParsecT[Char, Unit, List, Int] = (1 to n).foldLeft(r)((r, _) => r.map(_ + 1))
 
+    runPT[Char, List, Char, Unit, Int](rr, Unit, "aaron", 'c')
+  }
 }
